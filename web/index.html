@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Panel</title>
+    <style>
+        body {
+            background-color: #191919;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+        @media (max-width: 600px) {
+            .logo {
+                max-width: 100px;
+            }
+        }
+        #connection-status {
+            padding: 10px 20px;
+            margin-top: 20px;
+            border-top: 1px solid #333;
+        }
+        #connection-status p {
+            margin: 5px 0;
+        }
+        .io-box {
+            border: 1px solid #444;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .io-header {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .action-button {
+            flex: 1;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 3px;
+        }
+        .action-button.active {
+            background-color: #4CAF50;
+        }
+        .action-button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Establish WebSocket connection
+
+            // localhost is the loopback address, not eth0 
+            // let socket = new WebSocket("ws://localhost:7800", "ws-protocol-text");
+
+            // Jetson socket
+            let socket = new WebSocket("ws://192.168.168.50:7800", "ws-protocol-text");
+
+            // Handle WebSocket open
+            socket.onopen = function() {
+                console.log("WebSocket connection established.");
+                document.getElementById("connection-status").innerHTML += "<p style='color: green;'>WebSocket connection established.</p>";
+            };
+
+            // Handle incoming messages
+            socket.onmessage = function(event) {
+                console.log("Received message:", event.data);
+                try {
+                    let data = JSON.parse(event.data);
+                } catch (error) {
+                    console.error("Error parsing JSON:", error);
+                }
+            };
+
+            // Handle connection errors
+            socket.onerror = function(error) {
+                console.error("WebSocket Error: ", error);
+                document.getElementById("connection-status").innerHTML += "<p style='color: red;'>WebSocket Error: Check console for details</p>";
+            };
+
+            // Handle connection close
+            socket.onclose = function(event) {
+                console.log("WebSocket connection closed", event);
+                document.getElementById("connection-status").innerHTML += "<p style='color: red;'>WebSocket connection closed. Code: " + event.code + ", Reason: " + event.reason + "</p>";
+            };
+
+            // Handle button click to start the engine
+            document.getElementById("start-engine").addEventListener("click", function() {
+                console.log("Start Engine button clicked");
+                if (socket.readyState === WebSocket.OPEN) {
+                    console.log("Sending start-engine command");
+                    socket.send(JSON.stringify({ command: "start-engine" }));
+                } else {
+                    console.error("WebSocket is not open");
+                }
+            });
+
+            // Check WebSocket connection status periodically
+            setInterval(function() {
+                console.log("WebSocket readyState:", socket.readyState);
+            }, 5000);
+
+            setTimeout(function() {
+                if (socket.readyState !== WebSocket.OPEN) {
+                    console.error("WebSocket connection timeout");
+                    document.getElementById("connection-status").innerHTML += "<p style='color: red;'>WebSocket connection timeout</p>";
+                    socket.close();
+                }
+            }, 10000); // 10 seconds timeout
+
+            // Function to update button state
+            function updateButtonState() {
+                const engineStatus = document.getElementById("engine_running").innerText;
+                const startButton = document.getElementById("start-engine");
+                startButton.disabled = (engineStatus === "Running");
+            }
+
+            function updatePositionButtons(activeIndex) {
+                const buttons = ['position1', 'position2', 'position3'];
+                buttons.forEach((buttonId, index) => {
+                    const button = document.getElementById(buttonId);
+                    button.classList.toggle('active', index === activeIndex);
+                });
+            }
+
+            // Position control buttons
+            ['position1', 'position2', 'position3'].forEach((buttonId, index) => {
+                document.getElementById(buttonId).addEventListener("click", function() {
+                    if (socket.readyState === WebSocket.OPEN) {
+                        console.log(`Sending position command with index ${index}`);
+                        socket.send(JSON.stringify({ 
+                            command: "position-control",
+                            index: index 
+                        }));
+                        updatePositionButtons(index);
+                    } else {
+                        console.error("WebSocket is not open");
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h1>Control Panel</h1>
+    </div>
+    <div class="io-box">
+        <div class="io-header">I/O</div>
+        <div class="button-group">
+            <button id="position1" class="action-button">Position 1</button>
+            <button id="position2" class="action-button">Position 2</button>
+            <button id="position3" class="action-button">Position 3</button>
+        </div>
+    </div>
+
+    <div id="connection-status"></div>
+</body>
+</html>

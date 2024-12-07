@@ -1,0 +1,47 @@
+{
+    "Server": {
+        "port": 7800
+    },
+    "IO": {
+        "IO1": {
+            "pinNumber": 218,
+            "port": "pwmchip0",
+            "pinFunction": "PWM",
+            "pinName": "pwm0",
+            "direction": "OUTPUT",
+            "isEnabled": true,
+            "setPoints": [1000, 1500, 2000],
+            "initialValue": 0
+        },
+        "IO2": {
+            "pinNumber" : 228,
+            "port": "pwmchip2",
+            "pinFunction" : "PWM",
+            "pinName" : "",
+            "direction": "OUTPUT",
+            "isEnabled" : false,
+            "setPoints": [],
+            "initialValue": 1000
+        },
+        "IO3": {
+            "pinNumber" : 206,
+            "port": "pwmchip3",
+            "pinFunction" : "PWM",
+            "pinName" : "",
+            "direction": "INPUT",
+            "isEnabled" : false,
+            "setPoints": [],
+            "initialValue": 1000
+        },
+        "IO11": {
+            "pinNumber" : 185,
+            "port": "PCC.07",
+            "pinFunction" : "GPIO",
+            "pinName" : "light",
+            "direction": "OUTPUT",
+            "isEnabled" : true,
+            "setPoints": [0, 1],
+            "initialValue": 0
+        }
+    }
+}
