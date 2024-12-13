@@ -3,7 +3,7 @@ Example application running on Jetson Orin Nano. The daemon controls hardware de
 
  ### Dependencies
 
- The application has three dependencies outside of the standard C/C++ libraries.
+ The application has two dependencies outside of the standard C/C++ libraries.
 
  1. nlohmann/json
  1. libwebsockets
