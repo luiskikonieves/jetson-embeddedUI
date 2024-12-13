@@ -145,7 +145,6 @@ std::unique_ptr<IO> IOManager::createIO(const std::string& name, const Settings:
     }
 }
 
-// Add singleton instance
 IOManager& IOManager::getInstance() {
     static IOManager instance;
     return instance;
@@ -160,20 +159,19 @@ IO* IOManager::getIO(const std::string& name) {
 // Add GPIIO constructor implementation
 GPIIO::GPIIO(const std::string& name, const Config& config)
     : IO(name, config) {
-    // Initialize GPIO hardware here if needed
+    // TODO: Initialize GPIO hardware
 }
 
-// Add remaining GPIIO virtual function implementations
 void GPIIO::start() {
-    // Implement GPIO start logic
+    // TODO: Implement GPIO start logic
 }
 
 void GPIIO::stop() {
-    // Implement GPIO stop logic
+    // TODO: mplement GPIO stop logic
 }
 
 float GPIIO::read() const {
-    // Implement GPIO read logic
+    // TODO: Implement GPIO read logic
     return 0.0f;  // Placeholder return
 }
 

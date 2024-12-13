@@ -1,8 +1,6 @@
 # jetson-embeddedUI
 Example application running on Jetson Orin Nano. The daemon controls hardware devices attached to Jetson, and exposes them via a websocket. 
 
-This is based on previous work by James Alley. 
-
  ### Dependencies
 
  The application has three dependencies outside of the standard C/C++ libraries.
@@ -42,9 +40,10 @@ instructions.
 The CMakeLists.txt file provides two options for building:
 
 
-2. **ENABLE_LOGGING**: Enable testing mode
+2. **ENABLE_LOGGING**: Enable verbose logs
    - To enable: `cmake -DENABLE_LOGGING=ON ..`
-   - This option adds the ENABLE_LOGS compile definition.
+   - This option adds the ENABLE_LOGS compile definition, which enables websocket logging as well.
+      Beware, websocket logs are verbose.
 
 ### Web Files
 
@@ -54,3 +53,39 @@ Make sure you have the necessary permissions to write to `/var/www/webFiles/`. Y
 
 If running the application on your local machine the server IP address will likely be your loopback address. Modify
 `/var/www/webFiles/index.html` to use the loopback address: `let socket = new WebSocket("ws://localhost:7800", "ws-protocol-text");`.
+
+## IO Configuration
+
+Each IO is defined in `configuration/settings.json` under the "IO" object with properties that specify its behavior. The application
+will configure the IO based on the settings in the file during startup.
+
+- **pinNumber**: The physical pin number on the Jetson board
+- **port**: The hardware port identifier (e.g., "pwmchip0", "PCC.07")
+- **pinFunction**: Type of pin function - either "PWM" or "GPIO"
+- **pinName**: Optional friendly name for the pin
+- **direction**: "INPUT" or "OUTPUT"
+- **isEnabled**: Boolean to enable/disable the IO
+- **setPoints**: Array of valid values for the pin. For GPIO, typically [0,1]. For PWM, common values are between 1000-2000
+- **initialValue**: Starting value for the pin when the application launches
+
+Example configuration:
+
+```json
+{
+    "IO1": {
+        "pinNumber": 218,
+        "port": "pwmchip0",
+        "pinFunction": "PWM",
+        "pinName": "pwm0",
+        "direction": "OUTPUT",
+        "isEnabled": true,
+        "setPoints": [1000, 1500, 2000],
+        "initialValue": 0
+    }
+}
+```
+
+Note: Make sure to verify pin numbers and functions against your Jetson Orin Nano's pinout diagram to avoid hardware conflicts.
+
+
+

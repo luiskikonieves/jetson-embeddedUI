@@ -1,7 +1,7 @@
 /**
  * Provides thread management utilities in a multi-core environment.
- * It includes functionality to start threads with specific attributes such as core affinity,
- * scheduling policy, priority, and whether the thread is joinable or detached.
+ * Handles thread creation with attributes such as core affinity, scheduling 
+ * policy, priority, and whether the thread is joinable or detached.
  * 
 */
 

@@ -66,6 +66,10 @@ void PWM::start() {
     }
 }
 
+/**
+ * @brief Stops PWM output
+ * @throws std::runtime_error if unable to disable PWM
+ */
 void PWM::stop() {
     if (running) {
         try {
@@ -81,6 +85,12 @@ void PWM::stop() {
     }
 }
 
+/**
+ * @brief Sets the PWM duty cycle
+ * 
+ * @param dutyNs The duty cycle value in nanoseconds
+ * @throws std::runtime_error if unable to set duty cycle value
+ */
 void PWM::setDutyCycle(float dutyNs) {
     try {
         std::string path = std::string(PWM_BASE_DIR) + "/pwmchip" + 
@@ -92,6 +102,10 @@ void PWM::setDutyCycle(float dutyNs) {
     }
 }
 
+/**
+ * @brief Exports and initializes a PWM channel in the sysfs interface 
+ * @throws std::runtime_error if PWM export fails or if unable to write initial settings
+ */
 void PWM::exportPWM() {
     // Correct path structure: /sys/class/pwm/pwmchipX/...
     std::string chipDir = PWM_BASE_DIR + std::string("/pwmchip") + 
@@ -121,6 +135,10 @@ void PWM::exportPWM() {
     writeSysfs(pwmDir + "/enable", "0");
 }
 
+/**
+ * @brief Unexports a PWM channel from the sysfs interface
+ * @throws std::runtime_error if unable to unexport the PWM channel (error is caught and logged)
+ */
 void PWM::unexportPWM() {
     try {
         std::string path = std::string(PWM_BASE_DIR) + "/pwmchip" + 
@@ -131,8 +149,15 @@ void PWM::unexportPWM() {
     }
 }
 
+/**
+ * @brief Writes a value to a sysfs file in the Linux filesystem
+ * 
+ * @param path Full path to the sysfs file to write to
+ * @param value String value to write to the file
+ * @throws std::runtime_error if unable to open or write to the sysfs file
+ */
 void PWM::writeSysfs(const std::string& path, const std::string& value) {
-    std::cout << "Writing to " << path << ": " << value << std::endl;  // Debug output
+    std::cout << "Writing to " << path << ": " << value << std::endl; 
     std::ofstream fs(path);
     if (!fs.is_open()) {
         throw std::runtime_error("Failed to open sysfs file: " + path);
